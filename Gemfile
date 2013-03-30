@@ -4,8 +4,10 @@ ruby "2.0.0"
 gem 'rails', '4.0.0.beta1'
 
 group :development, :test do
-  gem 'sqlite3', '1.3.7'
+  # gem 'sqlite3', '1.3.7'
+  gem 'pg', '0.14.1'
   gem 'rspec-rails', '2.13.0'
+  gem 'guard-rspec', '2.5.0'
 end
 
 group :test do
