@@ -4,12 +4,16 @@ ruby "2.0.0"
 gem 'rails', '4.0.0.beta1'
 gem 'bootstrap-sass', '2.3.0.1'
 gem 'bcrypt-ruby', '3.0.1'
+gem 'faker', '1.1.2'
+gem 'will_paginate', '3.0.4'
+gem 'bootstrap-will_paginate', '0.0.9'
 
 group :development, :test do
   # gem 'sqlite3', '1.3.7'
   gem 'pg', '0.14.1'
   gem 'rspec-rails', '2.13.0'
   gem 'guard-rspec', '2.5.0'
+  gem 'launchy'
 end
 
 group :test do
