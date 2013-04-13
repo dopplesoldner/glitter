@@ -40,7 +40,7 @@ describe "UserPages" do
         fill_in "Name",         with: "Example User"
         fill_in "Email",        with: "user@example.com"
         fill_in "Password",     with: "foobar"
-        fill_in "Confirmation", with: "foobar"
+        fill_in "Confirm Password", with: "foobar"
       end
 
       it "should create a user" do
@@ -95,6 +95,15 @@ describe "UserPages" do
       specify {expect(user.reload.name).to eql(new_name)}
       specify {expect(user.reload.email).to eql(new_email)}
     end
+    
+    describe "forbidden attributes" do
+      let(:params) do
+        { user: { admin: true, password: user.password, 
+                      password_confirmation: user.password } }
+      end
+      before { patch user_path(user), params }
+        specify { expect(user.reload).not_to be_admin }
+      end  
   end
   
   describe "index" do
@@ -134,10 +143,15 @@ describe "UserPages" do
         end
         
         it {should have_link('delete', href: user_path(User.first))}
+        
         it "should be able to delete another user" do
           expect {page.all('delete')[1].click.to change(User, :count).by(-1)}
         end
-        it {should_not have_link('delete', href: user_path(admin))}
+        
+        it "should not be able to delete self" do
+          expect {page to_not have_link('delete', href: user_path(admin))}
+          expect {delete user_path(admin).to_not change(User, :count)}
+        end
       end
     end
   end

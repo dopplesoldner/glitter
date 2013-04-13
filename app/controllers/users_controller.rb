@@ -8,7 +8,11 @@ class UsersController < ApplicationController
   end
   
   def new
-    @user = User.new
+    if signed_in?
+      redirect_to(root_path)
+    else
+      @user = User.new
+    end
   end
   
   def show
@@ -16,13 +20,21 @@ class UsersController < ApplicationController
   end
   
   def create
-    @user = User.new(user_params)    # Not the final implementation!
-    if @user.save
-      sign_in @user
-      flash[:success] = "Welcome to the Sample App!"
-      redirect_to @user
-    else
-      render 'new'
+    if signed_in?
+      redirect_to(root_path)
+    else  
+      @user = User.new
+        @user.name = params[:user][:name]
+        @user.email = params[:user][:email]
+        @user.password = params[:user][:password]
+        @user.password_confirmation = params[:user][:password_confirmation]
+        if @user.save
+          sign_in @user
+          flash[:success] = "Welcome to the Sample App!"
+          redirect_to @user
+        else
+          render 'new'
+        end
     end
   end
   
@@ -31,7 +43,11 @@ class UsersController < ApplicationController
   
   def update
     @user = User.find(params[:id])
-    if @user.update_attributes(user_params)
+      @user.name = params[:user][:name] if !params[:user][:name].nil?
+      @user.email = params[:user][:email] if !params[:user][:email].nil?
+      @user.password = params[:user][:password]
+      @user.password_confirmation = params[:user][:password_confirmation]
+    if @user.save    
       flash[:success] = "Profile updated"
       sign_in @user
       redirect_to @user
@@ -41,14 +57,17 @@ class UsersController < ApplicationController
   end
   
   def destroy
-    User.find(params[:id]).destroy
-    flash[:success] = "User destroyed"
+    @user = User.find(params[:id])
+    if @user != current_user
+      @user.destroy
+      flash[:success] = "User destroyed"
+    end
     redirect_to users_url
   end
   
   private
     def user_params
-      params.require(:user).permit(:name, :email, :password, :password_confirmation)
+      params.require(:user).permit(:name, :email, :password, :password_confirmation, :admin)
     end
     
     def signed_in_user
