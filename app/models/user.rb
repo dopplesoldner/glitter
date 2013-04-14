@@ -1,7 +1,7 @@
 class User < ActiveRecord::Base
+  has_many :microposts, dependent: :destroy
   has_secure_password
   self.per_page = 10
-  
   
   #VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i
   VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-]+(\.[a-z]+)*\.[a-z]+\z/i  
@@ -15,9 +15,13 @@ class User < ActiveRecord::Base
   before_save { self.name = name.capitalize }
   before_save :create_remember_token
   
+  def feed
+    Micropost.where("user_id = ?", id)
+  end
+  
   private
   
-  def create_remember_token
-    self.remember_token = SecureRandom.urlsafe_base64
-  end
+    def create_remember_token
+      self.remember_token = SecureRandom.urlsafe_base64
+    end
 end
